@@ -20,13 +20,21 @@ const steps = [
 
 export default function AboutPage() {
   return (
-    <section className="py-12 space-y-12">
+    <section className="py-10 space-y-12">
       <div className="space-y-3">
         <p className="text-[11px] tracking-[0.22em] uppercase text-[#FF5A36] font-medium">
           Introducing Rote
         </p>
-        <h1 className="font-[family-name:var(--font-space-grotesk)] text-4xl sm:text-5xl font-medium tracking-tight text-[#14161A]">
-          Just R O T E it down.
+        <h1 className="text-4xl sm:text-5xl tracking-tight text-[#14161A]">
+          <span className="font-[family-name:var(--font-cursive)] italic">
+            Just
+          </span>{" "}
+          <span className="font-[family-name:var(--font-brand)] font-bold text-[#14161A]">
+            R O T E
+          </span>{" "}
+          <span className="font-[family-name:var(--font-cursive)] italic">
+            it down.
+          </span>
         </h1>
         <p className="text-[#4F5053] text-lg max-w-xl leading-relaxed">
           Speak freely. Rote listens and writes it down cleanly.

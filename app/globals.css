@@ -19,6 +19,10 @@
   --font-display: var(--font-space-grotesk);
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 html,
 body {
   background-color: var(--rote-paper);
@@ -39,19 +43,20 @@ body {
   padding: 0;
   margin: 0;
   font: inherit;
-  color: inherit;
+  font-weight: 600;
+  color: var(--rote-accent);
   cursor: pointer;
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
   transition: color 150ms ease, opacity 150ms ease;
 }
 
 .word-action:hover {
-  color: var(--rote-accent);
+  color: var(--rote-ink);
 }
 
 .word-action:focus-visible {
   outline: none;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-color: var(--rote-accent);
+  color: var(--rote-ink);
 }

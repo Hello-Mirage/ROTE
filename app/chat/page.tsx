@@ -64,14 +64,17 @@ export default function ChatPage() {
   }
 
   return (
-    <section className="flex-1 flex flex-col justify-between py-12 gap-12">
+    <section className="flex-1 flex flex-col justify-between py-10 gap-12">
       <div className="space-y-10">
         <div className="space-y-2">
           <p className="text-[11px] tracking-[0.22em] uppercase text-[#FF5A36] font-medium">
             Memroom Chat
           </p>
           <h1 className="font-[family-name:var(--font-space-grotesk)] text-3xl sm:text-4xl font-medium tracking-tight text-[#14161A]">
-            Ask your memory pool.
+            Ask your{" "}
+            <span className="font-[family-name:var(--font-cursive)] italic font-normal text-4xl sm:text-5xl">
+              memory pool.
+            </span>
           </h1>
         </div>
 

@@ -145,11 +145,19 @@ export default function Home() {
     : [];
 
   return (
-    <section className="flex-1 flex flex-col justify-center py-12">
+    <section className="flex-1 flex flex-col py-10">
       <div className="space-y-10">
         <div className="space-y-4">
-          <p className="text-[11px] tracking-[0.22em] uppercase text-[#FF5A36] font-medium">
-            Just R O T E it down
+          <p className="text-sm text-[#FF5A36] flex items-baseline gap-2">
+            <span className="font-[family-name:var(--font-cursive)] italic text-lg">
+              Just
+            </span>
+            <span className="font-[family-name:var(--font-brand)] text-base tracking-[0.2em] uppercase font-bold text-[#14161A]">
+              R O T E
+            </span>
+            <span className="font-[family-name:var(--font-cursive)] italic text-lg">
+              it down
+            </span>
           </p>
 
           <div className="flex items-baseline gap-6">
@@ -165,7 +173,7 @@ export default function Home() {
 
             {status === "recording" && (
               <div className="flex items-baseline gap-8">
-                <span className="font-[family-name:var(--font-space-grotesk)] text-5xl sm:text-6xl font-medium tracking-tight text-[#FF5A36] inline-flex items-center gap-4">
+                <span className="font-[family-name:var(--font-cursive)] italic text-6xl sm:text-7xl tracking-tight text-[#FF5A36] inline-flex items-center gap-4">
                   listening
                   <span
                     aria-hidden="true"
@@ -183,7 +191,7 @@ export default function Home() {
             )}
 
             {status === "transcribing" && (
-              <span className="font-[family-name:var(--font-space-grotesk)] text-5xl sm:text-6xl font-medium tracking-tight text-[#727376]">
+              <span className="font-[family-name:var(--font-cursive)] italic text-6xl sm:text-7xl tracking-tight text-[#727376]">
                 transcribing…
               </span>
             )}
