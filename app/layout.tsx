@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Instrument_Serif, Inter, Outfit, Space_Grotesk } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
@@ -58,10 +58,20 @@ export const metadata: Metadata = {
     description:
       "Minimal voice-to-text and personal AI memory pool.",
   },
+  icons: {
+    icon: "/rote-ai-logo.png",
+    apple: "/rote-ai-logo.png",
+  },
   robots: {
     index: true,
     follow: true,
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#F2EEE6",
 };
 
 export default function RootLayout({
@@ -77,9 +87,9 @@ export default function RootLayout({
     >
       <body
         suppressHydrationWarning
-        className="min-h-full flex flex-col bg-[#F2EEE6] text-[#14161A]"
+        className="min-h-dvh flex flex-col bg-[#F2EEE6] text-[#14161A]"
       >
-        <header className="w-full max-w-3xl mx-auto px-6 pt-10 pb-6 h-20 flex items-baseline justify-between shrink-0">
+        <header className="w-full max-w-3xl mx-auto px-5 sm:px-6 pt-6 sm:pt-10 pb-4 sm:pb-6 sm:h-20 flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between shrink-0">
           <Link
             href="/"
             className="no-underline inline-flex items-baseline gap-1.5 group leading-none"
@@ -92,30 +102,30 @@ export default function RootLayout({
             </span>
           </Link>
 
-          <nav className="flex items-baseline gap-6 text-sm font-semibold text-[#FF5A36]">
-            <Link href="/" className="no-underline hover:text-[#14161A] transition-colors">
+          <nav className="flex flex-wrap items-baseline gap-x-5 gap-y-2 sm:gap-6 text-sm font-semibold text-[#FF5A36]">
+            <Link href="/" className="no-underline hover:text-[#14161A] transition-colors py-1">
               speak
             </Link>
-            <Link href="/chat" className="no-underline hover:text-[#14161A] transition-colors">
+            <Link href="/chat" className="no-underline hover:text-[#14161A] transition-colors py-1">
               chat
             </Link>
-            <Link href="/memrooms" className="no-underline hover:text-[#14161A] transition-colors">
+            <Link href="/memrooms" className="no-underline hover:text-[#14161A] transition-colors py-1">
               memrooms
             </Link>
-            <Link href="/notes" className="no-underline hover:text-[#14161A] transition-colors">
+            <Link href="/notes" className="no-underline hover:text-[#14161A] transition-colors py-1">
               notes
             </Link>
-            <Link href="/about" className="no-underline hover:text-[#14161A] transition-colors">
+            <Link href="/about" className="no-underline hover:text-[#14161A] transition-colors py-1">
               about
             </Link>
           </nav>
         </header>
 
-        <main className="flex-1 w-full max-w-3xl mx-auto px-6 pb-12 flex flex-col">
+        <main className="flex-1 w-full max-w-3xl mx-auto px-5 sm:px-6 pb-12 flex flex-col">
           {children}
         </main>
 
-        <footer className="w-full max-w-3xl mx-auto px-6 pb-10 pt-4 flex items-center gap-2 text-xs text-[#727376]">
+        <footer className="w-full max-w-3xl mx-auto px-5 sm:px-6 pb-8 sm:pb-10 pt-4 flex items-center gap-2 text-xs text-[#727376]">
           <span>made by</span>
           <a
             href="https://terminalabs.live"

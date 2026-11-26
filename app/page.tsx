@@ -36,7 +36,9 @@ export default function Home() {
         ? "audio/webm;codecs=opus"
         : MediaRecorder.isTypeSupported("audio/webm")
           ? "audio/webm"
-          : "";
+          : MediaRecorder.isTypeSupported("audio/mp4")
+            ? "audio/mp4"
+            : "";
 
       const recorder = mimeType
         ? new MediaRecorder(stream, { mimeType })
@@ -54,9 +56,8 @@ export default function Home() {
         stream.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
 
-        const blob = new Blob(chunksRef.current, {
-          type: recorder.mimeType || "audio/webm",
-        });
+        const actualMime = recorder.mimeType || mimeType || "audio/webm";
+        const blob = new Blob(chunksRef.current, { type: actualMime });
 
         if (blob.size === 0) {
           setStatus("idle");
@@ -66,8 +67,9 @@ export default function Home() {
         setStatus("transcribing");
 
         try {
+          const ext = actualMime.includes("mp4") ? "mp4" : "webm";
           const formData = new FormData();
-          formData.append("audio", blob, "speech.webm");
+          formData.append("audio", blob, `speech.${ext}`);
 
           const res = await fetch("/api/transcribe", {
             method: "POST",

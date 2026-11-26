@@ -46,6 +46,7 @@ body {
   font-weight: 600;
   color: var(--rote-accent);
   cursor: pointer;
+  touch-action: manipulation;
   text-decoration: underline;
   text-underline-offset: 4px;
   text-decoration-thickness: 1.5px;
