@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Inter, Space_Grotesk, Syne } from "next/font/google";
+import { Instrument_Serif, Inter, Outfit, Space_Grotesk } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { getSiteUrl } from "@/lib/site";
@@ -22,7 +22,7 @@ const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
 });
 
-const syne = Syne({
+const outfit = Outfit({
   variable: "--font-brand",
   weight: ["600", "700"],
   subsets: ["latin"],
@@ -73,7 +73,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} ${syne.variable} h-full`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} ${outfit.variable} h-full`}
     >
       <body
         suppressHydrationWarning
@@ -85,7 +85,7 @@ export default function RootLayout({
             className="no-underline inline-flex items-baseline gap-1.5 group leading-none"
           >
             <span className="font-[family-name:var(--font-brand)] text-base tracking-[0.18em] uppercase font-bold text-[#14161A] group-hover:text-[#FF5A36] transition-colors">
-              ROTE
+              R O T E
             </span>
             <span className="font-[family-name:var(--font-cursive)] italic text-xl leading-none text-[#FF5A36]">
               ai
