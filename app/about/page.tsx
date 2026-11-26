@@ -1,4 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "About",
+  description:
+    "Introducing ROTE AI — Just R O T E it down. Speak freely and turn voice into clean text and searchable Memrooms.",
+  alternates: {
+    canonical: "/about",
+  },
+};
 
 const steps = [
   {

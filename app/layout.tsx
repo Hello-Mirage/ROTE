@@ -35,15 +35,25 @@ export const metadata: Metadata = {
     template: "%s — ROTE AI",
   },
   description:
-    "Minimal voice-to-text and personal AI memory pool. Speak freely, transcribe cleanly, and ask your Memrooms anything.",
+    "ROTE AI is a minimal voice-to-text and personal AI memory pool. Speak freely, transcribe cleanly, and ask your Memrooms anything.",
+  applicationName: "ROTE AI",
+  authors: [{ name: "terminaLABS", url: "https://terminalabs.live" }],
+  creator: "terminaLABS",
+  publisher: "terminaLABS",
   keywords: [
     "ROTE AI",
     "Rote",
+    "Just ROTE it down",
     "speech to text",
-    "voice notes",
-    "AI memory",
+    "voice to text",
+    "AI voice notes",
+    "AI memory pool",
     "Memrooms",
+    "terminaLABS",
   ],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "ROTE AI — Just R O T E it down.",
     description:
@@ -51,12 +61,21 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "ROTE AI",
     type: "website",
+    images: [
+      {
+        url: "/rote-ai-logo.png",
+        width: 1024,
+        height: 1024,
+        alt: "ROTE AI",
+      },
+    ],
   },
   twitter: {
     card: "summary",
     title: "ROTE AI — Just R O T E it down.",
     description:
       "Minimal voice-to-text and personal AI memory pool.",
+    images: ["/rote-ai-logo.png"],
   },
   icons: {
     icon: "/rote-ai-logo.png",
@@ -65,6 +84,12 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+    },
   },
 };
 
@@ -79,6 +104,24 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const siteUrl = getSiteUrl();
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "ROTE AI",
+    url: siteUrl,
+    description:
+      "Minimal voice-to-text and personal AI memory pool. Speak freely, transcribe cleanly, and ask your Memrooms anything.",
+    applicationCategory: "ProductivityApplication",
+    operatingSystem: "Any",
+    image: `${siteUrl}/rote-ai-logo.png`,
+    creator: {
+      "@type": "Organization",
+      name: "terminaLABS",
+      url: "https://terminalabs.live",
+    },
+  };
+
   return (
     <html
       lang="en"
@@ -89,6 +132,10 @@ export default function RootLayout({
         suppressHydrationWarning
         className="min-h-dvh flex flex-col bg-[#F2EEE6] text-[#14161A]"
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <header className="w-full max-w-3xl mx-auto px-5 sm:px-6 pt-6 sm:pt-10 pb-4 sm:pb-6 sm:h-20 flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between shrink-0">
           <Link
             href="/"

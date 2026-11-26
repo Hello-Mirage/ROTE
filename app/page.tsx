@@ -1,11 +1,42 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { addMemroom, type MemroomKeywords } from "@/lib/memrooms";
 import { saveNote } from "@/lib/notes";
 
 type Status = "idle" | "recording" | "transcribing";
+
+const SPEECH_THRESHOLD = 0.015;
+const SILENCE_DURATION_MS = 1100;
+const MIN_CHUNK_DURATION_MS = 600;
+
+function pickMimeType(): string {
+  if (typeof MediaRecorder === "undefined") return "";
+  if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
+    return "audio/webm;codecs=opus";
+  }
+  if (MediaRecorder.isTypeSupported("audio/webm")) {
+    return "audio/webm";
+  }
+  if (MediaRecorder.isTypeSupported("audio/mp4")) {
+    return "audio/mp4";
+  }
+  return "";
+}
+
+function emptyKeywords(): MemroomKeywords {
+  return { subjects: [], verbs: [], timing: [], date: [] };
+}
+
+function mergeKeywords(a: MemroomKeywords, b: MemroomKeywords): MemroomKeywords {
+  return {
+    subjects: Array.from(new Set([...a.subjects, ...b.subjects])),
+    verbs: Array.from(new Set([...a.verbs, ...b.verbs])),
+    timing: Array.from(new Set([...a.timing, ...b.timing])),
+    date: Array.from(new Set([...a.date, ...b.date])),
+  };
+}
 
 export default function Home() {
   const [status, setStatus] = useState<Status>("idle");
@@ -16,12 +47,130 @@ export default function Home() {
   const [saved, setSaved] = useState(false);
 
   const recorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const vadTimerRef = useRef<number | null>(null);
+  const isRecordingRef = useRef(false);
+  const hasSpokenRef = useRef(false);
+  const chunkStartRef = useRef(0);
+  const silenceStartRef = useRef<number | null>(null);
+  const queueRef = useRef<Promise<void>>(Promise.resolve());
+  const sessionTextRef = useRef("");
+  const sessionKwRef = useRef<MemroomKeywords>(emptyKeywords());
+
+  function cleanupAudio() {
+    if (vadTimerRef.current !== null) {
+      window.clearInterval(vadTimerRef.current);
+      vadTimerRef.current = null;
+    }
+    if (audioCtxRef.current) {
+      audioCtxRef.current.close().catch(() => {});
+      audioCtxRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      isRecordingRef.current = false;
+      if (recorderRef.current && recorderRef.current.state !== "inactive") {
+        recorderRef.current.stop();
+      }
+      cleanupAudio();
+    };
+  }, []);
+
+  async function transcribeBlob(blob: Blob, mime: string) {
+    const ext = mime.includes("mp4") ? "mp4" : "webm";
+    const formData = new FormData();
+    formData.append("audio", blob, `speech.${ext}`);
+
+    const res = await fetch("/api/transcribe", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || "Transcription failed.");
+    }
+    return data as { text?: string; keywords?: MemroomKeywords };
+  }
+
+  function startChunkRecorder(stream: MediaStream, mimeType: string) {
+    const recorder = mimeType
+      ? new MediaRecorder(stream, { mimeType })
+      : new MediaRecorder(stream);
+    const chunks: Blob[] = [];
+    const hadSpeech = { value: false };
+
+    hasSpokenRef.current = false;
+    chunkStartRef.current = Date.now();
+    silenceStartRef.current = null;
+
+    recorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        chunks.push(event.data);
+      }
+    };
+
+    recorder.onstop = () => {
+      const shouldTranscribe = hadSpeech.value || hasSpokenRef.current;
+      const actualMime = recorder.mimeType || mimeType || "audio/webm";
+      const blob = new Blob(chunks, { type: actualMime });
+
+      if (!shouldTranscribe || blob.size === 0) {
+        return;
+      }
+
+      const fetchPromise = transcribeBlob(blob, actualMime);
+      queueRef.current = queueRef.current.then(async () => {
+        try {
+          const data = await fetchPromise;
+          const chunkText = (data.text ?? "").trim();
+          if (!chunkText) return;
+
+          setTranscript((prev) => (prev ? `${prev} ${chunkText}` : chunkText));
+          sessionTextRef.current = sessionTextRef.current
+            ? `${sessionTextRef.current} ${chunkText}`
+            : chunkText;
+
+          if (data.keywords) {
+            sessionKwRef.current = mergeKeywords(
+              sessionKwRef.current,
+              data.keywords
+            );
+            setLastKeywords(sessionKwRef.current);
+          }
+        } catch (err) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Could not reach transcription service."
+          );
+        }
+      });
+    };
+
+    // Snapshot speech flag right before rotating/stopping
+    const originalStop = recorder.stop.bind(recorder);
+    recorder.stop = () => {
+      hadSpeech.value = hasSpokenRef.current;
+      originalStop();
+    };
+
+    recorderRef.current = recorder;
+    recorder.start();
+  }
 
   async function startRecording() {
     setError("");
     setSaved(false);
+    sessionTextRef.current = "";
+    sessionKwRef.current = emptyKeywords();
+    queueRef.current = Promise.resolve();
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setError("Microphone is not available in this browser.");
@@ -31,88 +180,84 @@ export default function Home() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
+      isRecordingRef.current = true;
 
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-        ? "audio/webm;codecs=opus"
-        : MediaRecorder.isTypeSupported("audio/webm")
-          ? "audio/webm"
-          : MediaRecorder.isTypeSupported("audio/mp4")
-            ? "audio/mp4"
-            : "";
-
-      const recorder = mimeType
-        ? new MediaRecorder(stream, { mimeType })
-        : new MediaRecorder(stream);
-
-      chunksRef.current = [];
-
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
-        }
-      };
-
-      recorder.onstop = async () => {
-        stream.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
-
-        const actualMime = recorder.mimeType || mimeType || "audio/webm";
-        const blob = new Blob(chunksRef.current, { type: actualMime });
-
-        if (blob.size === 0) {
-          setStatus("idle");
-          return;
-        }
-
-        setStatus("transcribing");
-
-        try {
-          const ext = actualMime.includes("mp4") ? "mp4" : "webm";
-          const formData = new FormData();
-          formData.append("audio", blob, `speech.${ext}`);
-
-          const res = await fetch("/api/transcribe", {
-            method: "POST",
-            body: formData,
-          });
-
-          const data = await res.json();
-
-          if (!res.ok) {
-            setError(data.error || "Transcription failed.");
-          } else if (data.text) {
-            setTranscript((prev) =>
-              prev ? `${prev}\n\n${data.text}` : data.text
-            );
-            const kw: MemroomKeywords = data.keywords ?? {
-              subjects: [],
-              verbs: [],
-              timing: [],
-              date: [],
-            };
-            addMemroom(data.text, kw);
-            setLastKeywords(kw);
-          }
-        } catch {
-          setError("Could not reach transcription service.");
-        } finally {
-          setStatus("idle");
-        }
-      };
-
-      recorderRef.current = recorder;
-      recorder.start();
+      const mimeType = pickMimeType();
+      startChunkRecorder(stream, mimeType);
       setStatus("recording");
+
+      // Monitor RMS volume for silence-triggered chunking
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
+
+      if (AudioCtx) {
+        const audioCtx = new AudioCtx();
+        audioCtxRef.current = audioCtx;
+        const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 1024;
+        source.connect(analyser);
+
+        const dataArray = new Float32Array(analyser.fftSize);
+
+        vadTimerRef.current = window.setInterval(() => {
+          if (!isRecordingRef.current) return;
+
+          analyser.getFloatTimeDomainData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            sum += dataArray[i] * dataArray[i];
+          }
+          const rms = Math.sqrt(sum / dataArray.length);
+          const now = Date.now();
+
+          if (rms >= SPEECH_THRESHOLD) {
+            hasSpokenRef.current = true;
+            silenceStartRef.current = null;
+          } else if (hasSpokenRef.current) {
+            if (silenceStartRef.current === null) {
+              silenceStartRef.current = now;
+            } else if (
+              now - silenceStartRef.current >= SILENCE_DURATION_MS &&
+              now - chunkStartRef.current >= MIN_CHUNK_DURATION_MS
+            ) {
+              // Rotate recorder on silence: finalize current chunk & immediately listen for next
+              const current = recorderRef.current;
+              if (current && current.state === "recording") {
+                current.stop();
+                startChunkRecorder(stream, mimeType);
+              }
+            }
+          }
+        }, 100);
+      }
     } catch {
+      cleanupAudio();
+      isRecordingRef.current = false;
       setError("Microphone permission denied.");
       setStatus("idle");
     }
   }
 
-  function stopRecording() {
+  async function stopRecording() {
+    isRecordingRef.current = false;
+
     if (recorderRef.current && recorderRef.current.state !== "inactive") {
       recorderRef.current.stop();
     }
+    cleanupAudio();
+
+    setStatus("transcribing");
+    await queueRef.current;
+
+    if (sessionTextRef.current) {
+      addMemroom(sessionTextRef.current, sessionKwRef.current);
+      setLastKeywords(sessionKwRef.current);
+    }
+
+    setStatus("idle");
   }
 
   async function handleCopy() {
@@ -150,7 +295,7 @@ export default function Home() {
     <section className="flex-1 flex flex-col py-10">
       <div className="space-y-10">
         <div className="space-y-4">
-          <p className="text-sm text-[#FF5A36] flex items-baseline gap-2">
+          <h1 className="text-sm text-[#FF5A36] flex items-baseline gap-2">
             <span className="font-[family-name:var(--font-cursive)] italic text-lg">
               Just
             </span>
@@ -160,7 +305,7 @@ export default function Home() {
             <span className="font-[family-name:var(--font-cursive)] italic text-lg">
               it down
             </span>
-          </p>
+          </h1>
 
           <div className="flex items-baseline gap-6">
             {status === "idle" && (
