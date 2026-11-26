@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { organizeNotesDirect, transcribeAudioDirect } from "@/lib/gemini";
+import { hasStoredApiKey } from "@/lib/keystore";
 import { addMemroom, type MemroomKeywords } from "@/lib/memrooms";
 import { saveNote, updateNoteTopics } from "@/lib/notes";
 
@@ -86,19 +88,7 @@ export default function Home() {
   }, []);
 
   async function transcribeBlob(blob: Blob, mime: string) {
-    const ext = mime.includes("mp4") ? "mp4" : "webm";
-    const formData = new FormData();
-    formData.append("audio", blob, `speech.${ext}`);
-
-    const res = await fetch("/api/transcribe", {
-      method: "POST",
-      body: formData,
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || "Transcription failed.");
-    }
-    return data as { text?: string; keywords?: MemroomKeywords };
+    return transcribeAudioDirect(blob, mime);
   }
 
   function startChunkRecorder(stream: MediaStream, mimeType: string) {
@@ -173,6 +163,11 @@ export default function Home() {
     sessionTextRef.current = "";
     sessionKwRef.current = emptyKeywords();
     queueRef.current = Promise.resolve();
+
+    if (!hasStoredApiKey()) {
+      setError("MISSING_KEY");
+      return;
+    }
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setError("Microphone is not available in this browser.");
@@ -285,16 +280,10 @@ export default function Home() {
     setTimeout(() => setSaved(false), 1500);
 
     // Auto-organize the saved note by topic in the background
-    fetch("/api/notes/organize", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ notes: [{ id: note.id, text: note.text }] }),
-    })
-      .then((res) => res.json())
-      .then((data: { topics?: { id: string; topic: string }[] }) => {
-        const match = data.topics?.find((t) => t.id === note.id);
-        if (match?.topic) {
-          updateNoteTopics({ [note.id]: match.topic.trim() });
+    organizeNotesDirect([{ id: note.id, text: note.text }])
+      .then((map) => {
+        if (Object.keys(map).length > 0) {
+          updateNoteTopics(map);
         }
       })
       .catch(() => {});
@@ -391,7 +380,17 @@ export default function Home() {
             </p>
           )}
 
-          {error && <p className="text-sm text-[#FF5A36]">{error}</p>}
+          {error === "MISSING_KEY" ? (
+            <p className="text-sm text-[#FF5A36]">
+              Add your Google AI Studio{" "}
+              <Link href="/key" className="word-action">
+                key
+              </Link>{" "}
+              first.
+            </p>
+          ) : (
+            error && <p className="text-sm text-[#FF5A36]">{error}</p>
+          )}
 
           {transcript && (
             <div className="flex items-baseline gap-6 text-sm text-[#727376]">

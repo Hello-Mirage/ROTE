@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { organizeNotesDirect } from "@/lib/gemini";
+import { hasStoredApiKey } from "@/lib/keystore";
 import {
   deleteNote,
   loadNotes,
@@ -42,57 +44,30 @@ export default function NotesPage() {
   const autoRanRef = useRef(false);
 
   const organizeNotes = useCallback(async (targetNotes: RoteNote[]) => {
-    if (targetNotes.length === 0) return;
+    if (targetNotes.length === 0 || !hasStoredApiKey()) return;
     setOrganizing(true);
     try {
-      const res = await fetch("/api/notes/organize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          notes: targetNotes.map((n) => ({ id: n.id, text: n.text })),
-        }),
-      });
-      const data = await res.json();
-      if (res.ok && Array.isArray(data.topics)) {
-        const map: Record<string, string> = {};
-        for (const item of data.topics as { id: string; topic: string }[]) {
-          if (item.id && item.topic) {
-            map[item.id] = item.topic.trim();
-          }
-        }
-        if (Object.keys(map).length > 0) {
-          updateNoteTopics(map);
-        }
+      const map = await organizeNotesDirect(
+        targetNotes.map((n) => ({ id: n.id, text: n.text }))
+      );
+      if (Object.keys(map).length > 0) {
+        updateNoteTopics(map);
       }
     } catch {
-      // Silent fallback: notes remain visible under Uncategorized
+      // Silent fallback: notes remain visible under General
     } finally {
       setOrganizing(false);
     }
   }, []);
 
   useEffect(() => {
-    if (autoRanRef.current || notes.length === 0) return;
+    if (autoRanRef.current || notes.length === 0 || !hasStoredApiKey()) return;
     const uncategorized = notes.filter((n) => !n.topic);
     if (uncategorized.length === 0) return;
 
     autoRanRef.current = true;
-    fetch("/api/notes/organize", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        notes: notes.map((n) => ({ id: n.id, text: n.text })),
-      }),
-    })
-      .then((res) => res.json())
-      .then((data: { topics?: { id: string; topic: string }[] }) => {
-        if (!Array.isArray(data.topics)) return;
-        const map: Record<string, string> = {};
-        for (const item of data.topics) {
-          if (item.id && item.topic) {
-            map[item.id] = item.topic.trim();
-          }
-        }
+    organizeNotesDirect(notes.map((n) => ({ id: n.id, text: n.text })))
+      .then((map) => {
         if (Object.keys(map).length > 0) {
           updateNoteTopics(map);
         }

@@ -162,6 +162,9 @@ export default function RootLayout({
             <Link href="/notes" className="no-underline hover:text-[#14161A] transition-colors py-1">
               notes
             </Link>
+            <Link href="/key" className="no-underline hover:text-[#14161A] transition-colors py-1">
+              key
+            </Link>
             <Link href="/about" className="no-underline hover:text-[#14161A] transition-colors py-1">
               about
             </Link>

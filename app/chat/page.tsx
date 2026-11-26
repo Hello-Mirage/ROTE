@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { chatWithMemroomsDirect } from "@/lib/gemini";
+import { hasStoredApiKey } from "@/lib/keystore";
 import { loadMemrooms } from "@/lib/memrooms";
 
 interface ChatTurn {
@@ -21,6 +23,11 @@ export default function ChatPage() {
     const message = input.trim();
     if (!message || busy) return;
 
+    if (!hasStoredApiKey()) {
+      setError("MISSING_KEY");
+      return;
+    }
+
     setError("");
     setBusy(true);
     setInput("");
@@ -32,32 +39,20 @@ export default function ChatPage() {
         answer: t.answer,
       }));
 
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message,
-          memrooms,
-          history,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Could not get answer.");
-        return;
-      }
+      const reply = await chatWithMemroomsDirect(message, memrooms, history);
 
       setTurns((prev) => [
         ...prev,
         {
           id: `${Date.now()}`,
           question: message,
-          answer: data.reply || "",
+          answer: reply,
         },
       ]);
-    } catch {
-      setError("Could not reach chat service.");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Could not reach Gemini API."
+      );
     } finally {
       setBusy(false);
     }
@@ -130,7 +125,17 @@ export default function ChatPage() {
           </button>
         </div>
 
-        {error && <p className="text-sm text-[#FF5A36]">{error}</p>}
+        {error === "MISSING_KEY" ? (
+          <p className="text-sm text-[#FF5A36]">
+            Add your Google AI Studio{" "}
+            <Link href="/key" className="word-action">
+              key
+            </Link>{" "}
+            first.
+          </p>
+        ) : (
+          error && <p className="text-sm text-[#FF5A36]">{error}</p>
+        )}
       </form>
     </section>
   );
