@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { addMemroom, type MemroomKeywords } from "@/lib/memrooms";
-import { saveNote } from "@/lib/notes";
+import { saveNote, updateNoteTopics } from "@/lib/notes";
 
 type Status = "idle" | "recording" | "transcribing";
 
 const SPEECH_THRESHOLD = 0.015;
 const SILENCE_DURATION_MS = 1100;
 const MIN_CHUNK_DURATION_MS = 600;
+const AUTO_STOP_SILENCE_MS = 6000;
 
 function pickMimeType(): string {
   if (typeof MediaRecorder === "undefined") return "";
@@ -54,6 +55,7 @@ export default function Home() {
   const hasSpokenRef = useRef(false);
   const chunkStartRef = useRef(0);
   const silenceStartRef = useRef<number | null>(null);
+  const lastSpeechAtRef = useRef(0);
   const queueRef = useRef<Promise<void>>(Promise.resolve());
   const sessionTextRef = useRef("");
   const sessionKwRef = useRef<MemroomKeywords>(emptyKeywords());
@@ -181,6 +183,7 @@ export default function Home() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
       isRecordingRef.current = true;
+      lastSpeechAtRef.current = Date.now();
 
       const mimeType = pickMimeType();
       startChunkRecorder(stream, mimeType);
@@ -216,18 +219,26 @@ export default function Home() {
           if (rms >= SPEECH_THRESHOLD) {
             hasSpokenRef.current = true;
             silenceStartRef.current = null;
-          } else if (hasSpokenRef.current) {
-            if (silenceStartRef.current === null) {
-              silenceStartRef.current = now;
-            } else if (
-              now - silenceStartRef.current >= SILENCE_DURATION_MS &&
-              now - chunkStartRef.current >= MIN_CHUNK_DURATION_MS
-            ) {
-              // Rotate recorder on silence: finalize current chunk & immediately listen for next
-              const current = recorderRef.current;
-              if (current && current.state === "recording") {
-                current.stop();
-                startChunkRecorder(stream, mimeType);
+            lastSpeechAtRef.current = now;
+          } else {
+            if (now - lastSpeechAtRef.current >= AUTO_STOP_SILENCE_MS) {
+              void stopRecording();
+              return;
+            }
+
+            if (hasSpokenRef.current) {
+              if (silenceStartRef.current === null) {
+                silenceStartRef.current = now;
+              } else if (
+                now - silenceStartRef.current >= SILENCE_DURATION_MS &&
+                now - chunkStartRef.current >= MIN_CHUNK_DURATION_MS
+              ) {
+                // Rotate recorder on silence: finalize current chunk & immediately listen for next
+                const current = recorderRef.current;
+                if (current && current.state === "recording") {
+                  current.stop();
+                  startChunkRecorder(stream, mimeType);
+                }
               }
             }
           }
@@ -269,9 +280,24 @@ export default function Home() {
 
   function handleSave() {
     if (!transcript) return;
-    saveNote(transcript);
+    const note = saveNote(transcript);
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
+
+    // Auto-organize the saved note by topic in the background
+    fetch("/api/notes/organize", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notes: [{ id: note.id, text: note.text }] }),
+    })
+      .then((res) => res.json())
+      .then((data: { topics?: { id: string; topic: string }[] }) => {
+        const match = data.topics?.find((t) => t.id === note.id);
+        if (match?.topic) {
+          updateNoteTopics({ [note.id]: match.topic.trim() });
+        }
+      })
+      .catch(() => {});
   }
 
   function handleClear() {
