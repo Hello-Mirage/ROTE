@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+:root {
+  --rote-paper: #F2EEE6;
+  --rote-sand: #E4DED2;
+  --rote-ink: #14161A;
+  --rote-ink-muted: #727376;
+  --rote-ink-soft: #4F5053;
+  --rote-accent: #FF5A36;
+}
+
+@theme inline {
+  --color-background: var(--rote-paper);
+  --color-foreground: var(--rote-ink);
+  --color-accent: var(--rote-accent);
+  --color-sand: var(--rote-sand);
+  --color-muted: var(--rote-ink-muted);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-space-grotesk);
+}
+
+html,
+body {
+  background-color: var(--rote-paper);
+  color: var(--rote-ink);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: #FF5A36;
+  color: #FFFFFF;
+}
+
+.word-action {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 150ms ease, opacity 150ms ease;
+}
+
+.word-action:hover {
+  color: var(--rote-accent);
+}
+
+.word-action:focus-visible {
+  outline: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--rote-accent);
+}
