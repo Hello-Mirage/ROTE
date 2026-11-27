@@ -69,10 +69,10 @@ export default function LandingPage() {
     };
   }, []);
 
-  // Desktop scroll transform: horizontal centered -> rotated on the right side
+  // Desktop scroll transform: horizontal centered -> rotated on the right side, lower-middle
   const rotateDeg = -90 * progress;
   const translateX = 215 * progress;
-  const translateY = 24 * progress;
+  const translateY = 76 * progress;
   const scale = 1 - 0.12 * progress;
 
   return (
@@ -119,7 +119,7 @@ export default function LandingPage() {
       {/* Desktop sticky pen + left-side slide info */}
       <div className="relative">
         {/* Sticky pen stage on desktop */}
-        <div className="hidden lg:block sticky top-28 z-10 pointer-events-none h-0">
+        <div className="hidden lg:block sticky top-[44vh] z-10 pointer-events-none h-0">
           <div className="flex justify-center">
             <img
               src="/rote-pen.png"

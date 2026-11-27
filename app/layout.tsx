@@ -136,36 +136,43 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <header className="w-full max-w-3xl mx-auto px-5 sm:px-6 pt-6 sm:pt-10 pb-4 sm:pb-6 sm:h-20 flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between shrink-0">
-          <Link
-            href="/"
-            className="no-underline inline-flex items-baseline gap-1.5 group leading-none"
-          >
-            <span className="font-[family-name:var(--font-brand)] text-base tracking-[0.18em] uppercase font-bold text-[#14161A] group-hover:text-[#FF5A36] transition-colors">
-              R O T E
-            </span>
-            <span className="font-[family-name:var(--font-cursive)] italic text-xl leading-none text-[#FF5A36]">
-              ai
-            </span>
-          </Link>
+        <header className="sticky top-0 z-30 w-full shrink-0">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#F2EEE6] via-[#F2EEE6]/85 to-transparent backdrop-blur-md [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]"
+          />
 
-          <nav className="flex flex-wrap items-baseline gap-x-5 gap-y-2 sm:gap-6 text-sm font-semibold text-[#FF5A36]">
-            <Link href="/app" className="no-underline hover:text-[#14161A] transition-colors py-1">
-              speak
+          <div className="relative w-full max-w-3xl mx-auto px-5 sm:px-6 pt-6 sm:pt-8 pb-6 flex flex-col items-center gap-3">
+            <Link
+              href="/"
+              className="no-underline inline-flex items-baseline gap-1.5 group leading-none"
+            >
+              <span className="font-[family-name:var(--font-brand)] text-base tracking-[0.18em] uppercase font-bold text-[#14161A] group-hover:text-[#FF5A36] transition-colors">
+                R O T E
+              </span>
+              <span className="font-[family-name:var(--font-cursive)] italic text-xl leading-none text-[#FF5A36]">
+                ai
+              </span>
             </Link>
-            <Link href="/chat" className="no-underline hover:text-[#14161A] transition-colors py-1">
-              chat
-            </Link>
-            <Link href="/notes" className="no-underline hover:text-[#14161A] transition-colors py-1">
-              notes
-            </Link>
-            <Link href="/key" className="no-underline hover:text-[#14161A] transition-colors py-1">
-              key
-            </Link>
-            <Link href="/about" className="no-underline hover:text-[#14161A] transition-colors py-1">
-              about
-            </Link>
-          </nav>
+
+            <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1.5 text-sm font-semibold text-[#FF5A36]">
+              <Link href="/app" className="no-underline hover:text-[#14161A] transition-colors py-0.5">
+                speak
+              </Link>
+              <Link href="/chat" className="no-underline hover:text-[#14161A] transition-colors py-0.5">
+                chat
+              </Link>
+              <Link href="/notes" className="no-underline hover:text-[#14161A] transition-colors py-0.5">
+                notes
+              </Link>
+              <Link href="/key" className="no-underline hover:text-[#14161A] transition-colors py-0.5">
+                key
+              </Link>
+              <Link href="/about" className="no-underline hover:text-[#14161A] transition-colors py-0.5">
+                about
+              </Link>
+            </nav>
+          </div>
         </header>
 
         <main className="flex-1 w-full max-w-3xl mx-auto px-5 sm:px-6 pb-12 flex flex-col">
