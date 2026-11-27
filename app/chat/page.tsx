@@ -78,11 +78,11 @@ export default function ChatPage() {
             <p>Ask anything about what you have said.</p>
             <p>
               <Link href="/app" className="word-action text-[#FF5A36]">
-                speak
+                Speak
               </Link>{" "}
               to add a memory, or inspect{" "}
               <Link href="/memrooms" className="word-action text-[#14161A]">
-                memrooms
+                Memrooms
               </Link>
               .
             </p>
@@ -119,9 +119,9 @@ export default function ChatPage() {
           <button
             type="submit"
             disabled={busy || !input.trim()}
-            className="word-action font-[family-name:var(--font-space-grotesk)] text-lg font-medium text-[#14161A] disabled:opacity-40"
+            className="word-action font-[family-name:var(--font-space-grotesk)] text-lg font-normal text-[#14161A] disabled:opacity-40"
           >
-            {busy ? "thinking…" : "send"}
+            {busy ? "Thinking…" : "Send"}
           </button>
         </div>
 

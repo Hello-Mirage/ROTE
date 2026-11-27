@@ -315,9 +315,9 @@ export default function SpeakAppPage() {
               <button
                 type="button"
                 onClick={startRecording}
-                className="word-action font-[family-name:var(--font-space-grotesk)] text-5xl sm:text-6xl font-medium tracking-tight text-[#14161A]"
+                className="word-action font-[family-name:var(--font-space-grotesk)] text-5xl sm:text-6xl font-normal tracking-tight text-[#14161A]"
               >
-                speak
+                Speak
               </button>
             )}
 
@@ -333,9 +333,9 @@ export default function SpeakAppPage() {
                 <button
                   type="button"
                   onClick={stopRecording}
-                  className="word-action font-[family-name:var(--font-space-grotesk)] text-2xl sm:text-3xl font-medium tracking-tight text-[#727376]"
+                  className="word-action font-[family-name:var(--font-space-grotesk)] text-2xl sm:text-3xl font-normal tracking-tight text-[#727376]"
                 >
-                  stop
+                  Stop
                 </button>
               </div>
             )}
@@ -387,24 +387,24 @@ export default function SpeakAppPage() {
                 onClick={handleCopy}
                 className="word-action"
               >
-                {copied ? "copied" : "copy"}
+                {copied ? "Copied" : "Copy"}
               </button>
               <button
                 type="button"
                 onClick={handleSave}
                 className="word-action"
               >
-                {saved ? "saved" : "save"}
+                {saved ? "Saved" : "Save"}
               </button>
               <button
                 type="button"
                 onClick={handleClear}
                 className="word-action"
               >
-                clear
+                Clear
               </button>
               <Link href="/chat" className="word-action text-[#FF5A36]">
-                ask chat
+                Ask chat
               </Link>
             </div>
           )}

@@ -55,7 +55,7 @@ export default function MemroomsPage() {
             onClick={() => clearMemrooms()}
             className="word-action text-sm text-[#727376]"
           >
-            clear all
+            Clear all
           </button>
         )}
       </div>
@@ -64,7 +64,7 @@ export default function MemroomsPage() {
         <div className="border-t border-[#E4DED2] pt-8 space-y-4">
           <p className="text-[#727376]">No memrooms yet.</p>
           <Link href="/app" className="word-action text-sm text-[#FF5A36]">
-            speak
+            Speak
           </Link>
         </div>
       ) : (
@@ -119,7 +119,7 @@ export default function MemroomsPage() {
                   onClick={() => deleteMemroom(room.id)}
                   className="word-action text-sm"
                 >
-                  delete
+                  Delete
                 </button>
               </div>
             </article>

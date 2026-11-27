@@ -116,7 +116,7 @@ export default function NotesPage() {
             onClick={() => void organizeNotes(notes)}
             className="word-action text-sm disabled:opacity-40"
           >
-            {organizing ? "organizing…" : "organize"}
+            {organizing ? "Organizing…" : "Organize"}
           </button>
         )}
       </div>
@@ -125,7 +125,7 @@ export default function NotesPage() {
         <div className="border-t border-[#E4DED2] pt-8 space-y-4">
           <p className="text-[#727376]">Nothing roted down yet.</p>
           <Link href="/app" className="word-action text-sm">
-            speak
+            Speak
           </Link>
         </div>
       ) : (
@@ -152,14 +152,14 @@ export default function NotesPage() {
                           onClick={() => handleCopy(note)}
                           className="word-action"
                         >
-                          {copiedId === note.id ? "copied" : "copy"}
+                          {copiedId === note.id ? "Copied" : "Copy"}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(note.id)}
                           className="word-action"
                         >
-                          delete
+                          Delete
                         </button>
                       </div>
                     </div>

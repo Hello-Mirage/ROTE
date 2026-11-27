@@ -43,7 +43,9 @@ body {
   padding: 0;
   margin: 0;
   font: inherit;
-  font-weight: 600;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--rote-accent);
   cursor: pointer;
   touch-action: manipulation;

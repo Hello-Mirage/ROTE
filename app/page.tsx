@@ -99,10 +99,10 @@ export default function LandingPage() {
 
         <div className="pt-2 flex flex-wrap items-baseline gap-6 text-base">
           <Link href="/app" className="word-action">
-            go to the rote ai
+            Go to the rote ai
           </Link>
           <Link href="/key" className="word-action text-sm">
-            add api key
+            Add api key
           </Link>
         </div>
 
@@ -248,7 +248,7 @@ export default function LandingPage() {
               </p>
               <div>
                 <Link href="/app" className="word-action text-base">
-                  go to the rote ai
+                  Go to the rote ai
                 </Link>
               </div>
             </div>

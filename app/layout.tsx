@@ -155,21 +155,21 @@ export default function RootLayout({
               </span>
             </Link>
 
-            <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1.5 text-sm font-semibold text-[#FF5A36]">
+            <nav className="w-full max-w-md sm:max-w-xl flex items-center justify-between text-xs sm:text-sm font-normal uppercase tracking-[0.12em] text-[#FF5A36]">
               <Link href="/app" className="no-underline hover:text-[#14161A] transition-colors py-0.5">
-                speak
+                Speak
               </Link>
               <Link href="/chat" className="no-underline hover:text-[#14161A] transition-colors py-0.5">
-                chat
+                Chat
               </Link>
               <Link href="/notes" className="no-underline hover:text-[#14161A] transition-colors py-0.5">
-                notes
+                Notes
               </Link>
               <Link href="/key" className="no-underline hover:text-[#14161A] transition-colors py-0.5">
-                key
+                Key
               </Link>
               <Link href="/about" className="no-underline hover:text-[#14161A] transition-colors py-0.5">
-                about
+                About
               </Link>
             </nav>
           </div>

@@ -82,7 +82,7 @@ export default function KeyPage() {
               disabled={!value.trim()}
               className="word-action text-base disabled:opacity-40"
             >
-              save
+              Save
             </button>
           </div>
 
@@ -94,7 +94,7 @@ export default function KeyPage() {
                 onClick={handleRemove}
                 className="word-action"
               >
-                remove
+                Remove
               </button>
             )}
             <a
@@ -103,10 +103,10 @@ export default function KeyPage() {
               rel="noopener noreferrer"
               className="word-action"
             >
-              get a key
+              Get a key
             </a>
             <Link href="/app" className="word-action">
-              speak
+              Speak
             </Link>
           </div>
 
