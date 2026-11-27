@@ -156,9 +156,6 @@ export default function RootLayout({
             <Link href="/chat" className="no-underline hover:text-[#14161A] transition-colors py-1">
               chat
             </Link>
-            <Link href="/memrooms" className="no-underline hover:text-[#14161A] transition-colors py-1">
-              memrooms
-            </Link>
             <Link href="/notes" className="no-underline hover:text-[#14161A] transition-colors py-1">
               notes
             </Link>

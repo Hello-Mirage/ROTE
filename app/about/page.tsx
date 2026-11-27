@@ -72,6 +72,38 @@ export default function AboutPage() {
         ))}
       </div>
 
+      <div className="space-y-4">
+        <p className="text-[11px] tracking-[0.22em] uppercase text-[#FF5A36] font-medium">
+          Built by terminaLABS
+        </p>
+
+        <div className="divide-y divide-[#E4DED2] border-t border-b border-[#E4DED2]">
+          <div className="py-4 flex items-baseline justify-between gap-4">
+            <a
+              href="https://www.linkedin.com/in/miraj-rahaman-6a4a03444/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="word-action font-[family-name:var(--font-space-grotesk)] text-base"
+            >
+              Miraj Rahaman
+            </a>
+            <span className="text-sm text-[#727376]">Founder</span>
+          </div>
+
+          <div className="py-4 flex items-baseline justify-between gap-4">
+            <a
+              href="https://www.linkedin.com/in/numan-hameed-ansari-04489819b/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="word-action font-[family-name:var(--font-space-grotesk)] text-base"
+            >
+              Numan Hameed Ansari
+            </a>
+            <span className="text-sm text-[#727376]">Co-founder</span>
+          </div>
+        </div>
+      </div>
+
       <div>
         <Link href="/app" className="word-action text-sm text-[#FF5A36]">
           speak
