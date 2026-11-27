@@ -124,7 +124,7 @@ export default function NotesPage() {
       {notes.length === 0 ? (
         <div className="border-t border-[#E4DED2] pt-8 space-y-4">
           <p className="text-[#727376]">Nothing roted down yet.</p>
-          <Link href="/" className="word-action text-sm">
+          <Link href="/app" className="word-action text-sm">
             speak
           </Link>
         </div>

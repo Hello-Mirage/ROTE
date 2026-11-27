@@ -63,7 +63,7 @@ export default function MemroomsPage() {
       {rooms.length === 0 ? (
         <div className="border-t border-[#E4DED2] pt-8 space-y-4">
           <p className="text-[#727376]">No memrooms yet.</p>
-          <Link href="/" className="word-action text-sm text-[#FF5A36]">
+          <Link href="/app" className="word-action text-sm text-[#FF5A36]">
             speak
           </Link>
         </div>

@@ -77,7 +77,7 @@ export default function ChatPage() {
           <div className="border-t border-[#E4DED2] pt-8 space-y-3 text-sm text-[#727376]">
             <p>Ask anything about what you have said.</p>
             <p>
-              <Link href="/" className="word-action text-[#FF5A36]">
+              <Link href="/app" className="word-action text-[#FF5A36]">
                 speak
               </Link>{" "}
               to add a memory, or inspect{" "}

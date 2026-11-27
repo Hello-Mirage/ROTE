@@ -105,7 +105,7 @@ export default function KeyPage() {
             >
               get a key
             </a>
-            <Link href="/" className="word-action">
+            <Link href="/app" className="word-action">
               speak
             </Link>
           </div>

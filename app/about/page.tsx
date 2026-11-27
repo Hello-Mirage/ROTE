@@ -73,7 +73,7 @@ export default function AboutPage() {
       </div>
 
       <div>
-        <Link href="/" className="word-action text-sm text-[#FF5A36]">
+        <Link href="/app" className="word-action text-sm text-[#FF5A36]">
           speak
         </Link>
       </div>

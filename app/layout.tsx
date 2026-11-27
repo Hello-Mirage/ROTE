@@ -150,7 +150,7 @@ export default function RootLayout({
           </Link>
 
           <nav className="flex flex-wrap items-baseline gap-x-5 gap-y-2 sm:gap-6 text-sm font-semibold text-[#FF5A36]">
-            <Link href="/" className="no-underline hover:text-[#14161A] transition-colors py-1">
+            <Link href="/app" className="no-underline hover:text-[#14161A] transition-colors py-1">
               speak
             </Link>
             <Link href="/chat" className="no-underline hover:text-[#14161A] transition-colors py-1">
